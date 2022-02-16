@@ -59,14 +59,31 @@ const getRandomId = () => {
 
 app.post('/api/persons', (request, response) => {
     const body = request.body;
-    let id = getRandomId();
-    let found = persons.find(person => person.id === id)
-    
-    while(found) {
-        id = getRandomId();
-        found = persons.find(person => person.id === id)
+    if(!body.name || !body.number) {
+        return response
+                .status(400)
+                .json({
+                    error: 'name or number is missing',
+                })
     }
+
+    const foundName = persons.find(person => person.name === body.name);
+    if(foundName) {
+        return response
+                .status(400)
+                .json({
+                    error: 'name must be unique',
+                });
+    }
+
+    let id = getRandomId();
+    let foundId = persons.find(person => person.id === id)
     
+    while(foundId) {
+        id = getRandomId();
+        foundId = persons.find(person => person.id === id)
+    }
+
     const person = {
         id: id,
         name: body.name,
