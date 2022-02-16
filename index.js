@@ -1,11 +1,13 @@
 const express = require('express');
 const app = express();
 
+app.use(express.json());
+
 let persons = [
     { 
-      id: 1,
-      name: "Arto Hellas", 
-      number: "040-123456"
+        id: 1,
+        name: "Arto Hellas", 
+        number: "040-123456"
     },
     { 
         id: 2,
@@ -47,6 +49,31 @@ app.delete('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id);
     persons = persons.filter(person => person.id !== id);
     response.status(204).end();
+})
+
+const getRandomId = () => {
+    const min = 1;
+    const max = 50000;
+    return Math.floor(Math.random() * (max - min) + min);
+}
+
+app.post('/api/persons', (request, response) => {
+    const body = request.body;
+    let id = getRandomId();
+    let found = persons.find(person => person.id === id)
+    
+    while(found) {
+        id = getRandomId();
+        found = persons.find(person => person.id === id)
+    }
+    
+    const person = {
+        id: id,
+        name: body.name,
+        number: body.number,
+    }
+    persons = persons.concat(person);
+    response.json(person);
 })
 
 const PORT = 3001;
