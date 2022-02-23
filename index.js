@@ -47,16 +47,23 @@ app.delete('/api/persons/:id', (request, response, next) => {
 app.post('/api/persons', (request, response, next) => {
     const body = request.body;
 
-    const person = new Person({
-        name: body.name,
-        number: body.number,
-    });
+    Person.find({name: body.name}).then(result => {
+        if(result.length) {
+            return response.status(400).json({error: `The username ${body.name} already exists`});
+        } else {
+            const person = new Person({
+                name: body.name,
+                number: body.number,
+            });
 
-    person.save()
-        .then(savedPerson => {
-            response.json(savedPerson);
-        })
-        .catch(error => next(error));
+            person.save()
+                .then(savedPerson => {
+                    response.json(savedPerson);
+                })
+                .catch(error => next(error));
+        }
+    })
+    
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
